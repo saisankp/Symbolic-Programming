@@ -1,0 +1,16 @@
+% EXERCISE 1
+% Knowledge base given from the question so far:
+numeral(0).
+numeral(s(X)) :- numeral(X).
+numeral(X+Y) :- numeral(X), numeral(Y).
+add(0,X,X).
+add(s(X),Y,s(Z)) :- add(X,Y,Z).
+
+% Predicate simplifyingHelper (helper predicate) which simplifies before addition.
+simplifyHelper(0,0).                                  % Base case
+simplifyHelper(X+0,Z) :- simplifyHelper(X,Z).         % [X+0] = [X]
+simplifyHelper(X+s(Y),s(Z)) :- simplifyHelper(X+Y,Z). % [X+successor(Y) = successor(Z)] = [X + Y = Z]
+simplifyHelper(s(X),s(Z)) :- simplifyHelper(X,Z).     % [successor(X) = successor(Y)] = [X = Y]
+
+% Predicate add2(X,Y,Z) that simplifies the operands X and Y, adds them together and simplifies the result Z.
+add2(X,Y,Z) :- simplifyHelper(X,SimplifiedX), simplifyHelper(Y,SimplifiedY), simplifyHelper(SimplifiedX+SimplifiedY,Z).

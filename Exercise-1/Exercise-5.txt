@@ -1,0 +1,38 @@
+% EXERCISE 5
+% Knowledge base given from the question so far:
+numeral(0).
+numeral(s(X)) :- numeral(X).
+numeral(X+Y) :- numeral(X), numeral(Y).
+numeral(p(X)) :- numeral(X).
+numeral(-X) :- numeral(X).
+add(0,X,X).
+add(s(X),Y,s(Z)) :- add(X,Y,Z).
+
+% Predicate simplifyingHelper (helper predicate) which simplifies before addition.
+simplifyHelper(0,0).                                  			% Base case
+simplifyHelper(X+0,Z) :- simplifyHelper(X, Z).         			% [X+0] = [X]
+simplifyHelper(s(X),s(Z)) :- X \= p(_), simplifyHelper(X,Z).  	% [successor(X) = successor(Z)] = [X=Z], X != p(_) added to avoid repeated answers in prolog output.
+simplifyHelper(p(s(X)),Z) :- simplifyHelper(X,Z).				% [predecessor(successor(X)) = Z] = [X = Z]
+simplifyHelper(s(p(X)),Z) :- simplifyHelper(X,Z).				% [successor(predecessor(X)) = Z] = [X = Z]
+simplifyHelper(X+s(Y),Z) :- simplifyHelper(s(X)+Y,Z). 			% [X+successor(Y) = Z] = [successor(X)+Y = Z]
+simplifyHelper(X+p(Y),Z) :- simplifyHelper(p(X)+Y,Z).			% [X+predecessor(Y) = Z] = [predecessor(X)+Y = Z]
+simplifyHelper(p(X),p(Z)) :- X \= s(_), simplifyHelper(X,Z). 	% [predecessor(X) = predecessor(Z)] = [X = Z], X != s(_) added to avoid repeated answers in prolog output.
+simplifyHelper(-p(X), Z) :- minus(p(X), Z).  					% [-(predecessor(X) = Z)] = [minus(predecessor(X) = Z)]
+simplifyHelper(-s(X), Z) :- minus(s(X), Z).  					% [-(successor(X) = Z)] = [minus(successor(X) = Z)]
+
+% Predicate addHelper(X,Y,Z) (helper predicate) which computes the partial result of X+Y=Z by simplifying the operands X and Y, adding them together, and simplifying the result Z.
+addHelper(X,Y,Z) :- simplifyHelper(X,SimplifiedX), simplifyHelper(Y,SimplifiedY), simplifyHelper(SimplifiedX+SimplifiedY,Z).
+
+% Predicate add2(X,Y,Z) that calculates the final result of X+Y=Z with the predicate addHelper(X,Y,Z) and simplifying the output Z.
+add2(X, Y, Z) :- addHelper(X,Y,A), simplifyHelper(A, Z).
+
+% Predicate opposite(X,Y) (helper predicate) that gets the opposite result Y of a value X.
+opposite(0, 0).								% OPPOSITE(0) = 0
+opposite(s(X), p(Z)) :- opposite(X, Z).		% OPPOSITE(successor(X)) = predecessor(X)
+opposite(p(X), s(Z)) :- opposite(X, Z).		% OPPOSITE(predecessor(X)) = successor(X)
+
+% Predicate minus(X,Y) that gets the opposite value of X (i.e. -X) and simplfies it for the result Y.
+minus(X, Y) :- opposite(X, OppositeX), simplifyHelper(OppositeX, Y).
+
+% Predicate subtract(X,Y,Z) that computes X-Y=Z by simplifying the operands X and Y, subtracting Y from X, and simplifying the result Z.
+subtract(X,Y,Z) :- simplifyHelper(X, SimplifiedX), simplifyHelper(Y, SimplifiedY), minus(SimplifiedY, MinusY), add2(SimplifiedX, MinusY, Z).

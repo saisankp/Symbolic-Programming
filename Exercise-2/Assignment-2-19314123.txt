@@ -1,0 +1,93 @@
+%Question 1
+
+%Predicate to help us solve the problem with arity 2.
+nbd --> house(A), house(B), house(C), 
+    {
+    %Check if first element is equal for A and B
+    first(A, Try1), first(B, Try2), Try1 \== Try2,
+    %Check if first element is equal for B and C
+    first(B, Try3), first(C, Try4), Try3 \== Try4,
+    %Check if first element is equal for A and C
+    first(A, Try5), first(C, Try6), Try5 \== Try6,
+    %Check if second element is equal for A and B
+    second(A, Try7), second(B, Try8), Try7 \== Try8,
+    %Check if second element is equal for B and C
+    second(B, Try9), second(C, Try10), Try9 \== Try10,
+    %Check if second element is equal for A and C
+    second(A, Try11), second(C, Try12), Try11 \== Try12,
+    %Check if third element is equal for A and B
+    third(A, Try13), third(B, Try14), Try13 \== Try14,
+    %Check if third element is equal for B and C
+    third(B, Try15), third(C, Try16), Try15 \== Try16,
+    %Check if third element is equal for A and C
+    third(A, Try17), third(C, Try18), Try17 \== Try18
+    }.
+
+%predicate to separate the h(X,Y,Z) and work on the X,Y,Z with helper statements.
+house(A) --> [h(X,Y,Z)], {col(X), nat(Y), pet(Z), A = [X,Y,Z]}.
+
+%Helper predicates that are used to get the first, 
+%second and third elements in a list.
+first([E|_], E).
+second([_,E|_], E).
+third([_,_,E|_], E).
+
+%Some statements about the problem itself, to help us solve the problem.
+col(red).
+col(blue).
+col(green).
+nat(spanish).
+nat(japanese).
+nat(english).
+pet(jaguar).
+pet(snail).
+pet(zebra).
+
+
+%Question 2
+
+%Begin DCG to help us that generates lists [F0, F1, . . . , Fk] for every k ≥ 1.
+fib --> [0,1], fibn(0,1).
+%Any two numbers will give []
+fibn(_,_) --> [].
+%Recursive logic to find the next element in the list.
+fibn(F2,F1) --> {F is F2+F1}, [F], fibn(F1,F).
+
+
+%Question 3
+
+%(A)
+
+%N/A
+
+%(B)
+
+%N/A
+
+%(C)
+
+%Helper predicate to help ith/3 to be true exactly if Z = ai
+helper(_, 0, []).
+helper(Offset, InputLength, Q) :- 
+    InputLength > 0,
+    List is Offset mod 2,
+    Param1 is Offset // 2,
+    Param2 is InputLength - 1,
+    helper(Param1, Param2, Result),
+    append(Result, [List], Q).
+
+%Predicate ith/3 is true exactly if Z = ai using logs
+ith(I, N, A) :- 
+    RI is I + (2 ** (N - 1) - 1),
+    Len is floor(log(RI) / log(2)),
+    Offset is RI - (2 ** Len),
+    length(Z,N),
+    helper(Offset, Len, Q),
+    Z = [1|Y],
+    append(X,Y,Q),
+    append(X,Z,A).
+
+
+
+
+
